@@ -4,11 +4,10 @@
   "description": "![cf](https://i.imgur.com/7v5ASc8.png) 11: Single Resource Express API ======",
   "main": "index.js",
   "scripts": {
-    "test": "eslint . && jest --coverage --forceExit",
+    "test": "eslint . && jest --coverage --forceExit --runInBand",
     "start": "nodemon index.js",
     "dbon": "mkdir -p ./db && mongod --dbpath ./db",
     "dboff": "killall mongod"
-
   },
   "jest": {
     "setupFiles": [
@@ -42,6 +41,7 @@
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "faker": "^4.1.0",
+    "http-errors": "^1.6.3",
     "mongoose": "^5.0.17",
     "uuid": "^3.2.1",
     "winston": "^3.0.0-rc5"

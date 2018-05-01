@@ -20,15 +20,15 @@ describe('/api/car', () => {
   beforeAll(startServer);
   afterAll(stopServer);
   afterEach(() => Car.remove({}));
-  const testCar = {
-    make: 'Suburu',
-    model: 'Forester', 
-    year: 2009,
-    color: 'orange',
-  };
-
+  
   test('POST - should respond with 200 status and posted information', () => {
-    return superagent.post('/api/car')
+    const testCar = {
+      make: 'Suburu',
+      model: 'Forester', 
+      year: 2009,
+      color: 'orange',
+    };
+    return superagent.post(apiURL)
       .send(testCar)
       .then((response) => {
         expect(response.status).toEqual(200);
@@ -38,5 +38,41 @@ describe('/api/car', () => {
         expect(response.body.year).toEqual(testCar.year);
         expect(response.body._id).toBeTruthy();
       });
+  });
+
+  test('POST - should respond with 400 status for error', () => {
+    const testCar = {
+      make: faker.lorem.words(5),
+    };
+    return superagent.post(apiURL)
+      .send(testCar)
+      .then(Promise.reject)
+      .catch((response) => {
+        expect(response.status).toEqual(400);
+      });
+  });
+
+  describe('GET api/car', () => {
+    test('GET - should respond with 200 status and information', () => {
+      let testCar = null;
+      return createMockCar()
+        .then((car) => {
+          testCar = car;
+          return superagent.get(`${apiURL}/${testCar._id}`);
+        })
+        .then((response) => {
+          expect(response.status).toEqual(200);
+          expect(response.body.make).toEqual(testCar.make);
+          expect(response.body.year).toEqual(testCar.year);
+          expect(response.body._id).toEqual(testCar._id);
+        });
+    });
+    test('GET- should respond with 400 error if car doesn\'t exist', () => {
+      return superagent.get(`${apiURL}/blahblahblah`)
+        .then(Promise.reject)
+        .catch((response) => {
+          expect(response.status).toEqual(404);
+        });
+    });
   });
 });

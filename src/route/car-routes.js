@@ -36,6 +36,20 @@ carRouter.get('/api/car/:id', (request, response, next) => {
     .catch(next);
 });
 
+carRouter.put('/api/car/:id', jsonParser, (request, response, next) => {
+  const options = { runValidators: true, new: true };
+  return Car.findByIdAndUpdate(request.params.id, request.body, options)
+    .then((car) => {
+      if (!car) {
+        logger.log(logger.INFO, 'GET error, no car found with this id');
+        return next(new HttpErrors(404, 'car not found'));
+      }
+      logger.log(logger.INFO, 'PUT success, responding with 200');
+      return response.json(car);
+    })
+    .catch(next);
+});
+
 carRouter.delete('/api/car/:id', (request, response) => {
   return Car.findByIdAndRemove(request.params.id)
     .then((car) => {

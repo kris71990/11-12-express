@@ -7,6 +7,13 @@ import { startServer, stopServer } from '../lib/server';
 
 const apiURL = `http://localhost:${process.env.PORT}/api/car`;
 
+const fakerMocks = () => {
+  return new Car({
+    make: faker.lorem.words(2),
+    model: faker.lorem.words(3),
+  }).save();
+};
+
 const createMockCar = () => {
   return new Car({
     make: 'Honda',
@@ -14,6 +21,12 @@ const createMockCar = () => {
     year: 2012,
     color: 'silver',
   }).save();
+};
+
+const createManyMocks = (howMany) => {
+  return Promise.all(new Array(howMany)
+    .fill(0)
+    .map(() => fakerMocks()));
 };
 
 describe('/api/car', () => {
@@ -92,6 +105,39 @@ describe('/api/car', () => {
       return createMockCar()
         .then(() => {
           return superagent.delete(`${apiURL}/1234`);
+        })
+        .then(Promise.reject)
+        .catch((response) => {
+          expect(response.status).toEqual(404);
+        });
+    });
+  });
+
+  describe('UPDATE api/car/:id', () => {
+    test('PUT - should respond with 200 status and updated information', () => {
+      let testCar = null;
+      return createMockCar()
+        .then((car) => {
+          testCar = car;
+          return superagent.put(`${apiURL}/${car._id}`)
+            .send({ 
+              make: 'Ford', 
+              model: 'Focus', 
+            });
+        })
+        .then((response) => {
+          expect(response.status).toEqual(200);
+          expect(response.body.make).toEqual('Ford');
+          expect(response.body.model).toEqual('Focus');
+          expect(response.body.year).toEqual(testCar.year);
+          expect(response.body._id).toEqual(testCar._id.toString());
+        });
+    });
+
+    test('UPDATE - should respond with 404 for id not found', () => {
+      return createMockCar()
+        .then(() => {
+          return superagent.put(`${apiURL}/1234`);
         })
         .then(Promise.reject)
         .catch((response) => {

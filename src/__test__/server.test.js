@@ -52,22 +52,22 @@ describe('/api/car', () => {
       });
   });
 
-  describe('GET api/car', () => {
+  describe('GET api/car/:id', () => {
     test('GET - should respond with 200 status and information', () => {
       let testCar = null;
       return createMockCar()
         .then((car) => {
           testCar = car;
-          return superagent.get(`${apiURL}/${testCar._id}`);
+          return superagent.get(`${apiURL}/${car._id}`);
         })
         .then((response) => {
           expect(response.status).toEqual(200);
           expect(response.body.make).toEqual(testCar.make);
           expect(response.body.year).toEqual(testCar.year);
-          expect(response.body._id).toEqual(testCar._id);
+          expect(response.body._id).toBeTruthy();
         });
     });
-    test('GET- should respond with 400 error if car doesn\'t exist', () => {
+    test('GET - should respond with 404 error if car doesn\'t exist', () => {
       return superagent.get(`${apiURL}/blahblahblah`)
         .then(Promise.reject)
         .catch((response) => {
@@ -75,4 +75,29 @@ describe('/api/car', () => {
         });
     });
   });
+  
+  describe('DELETE api/car/:id', () => {
+    test('DELETE - should respond with 200 status', () => {
+      return createMockCar()
+        .then((car) => {
+          return superagent.delete(`${apiURL}/${car._id}`);
+        })
+        .then((response) => {
+          expect(response.status).toEqual(200);
+          expect(response.body._id).toBeFalsy();
+        });
+    });
+
+    test('DELETE - should respond with 404 for id not found', () => {
+      return createMockCar()
+        .then(() => {
+          return superagent.delete(`${apiURL}/1234`);
+        })
+        .then(Promise.reject)
+        .catch((response) => {
+          expect(response.status).toEqual(404);
+        });
+    });
+  });
 });
+

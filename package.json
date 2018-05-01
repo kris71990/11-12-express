@@ -4,7 +4,7 @@
   "description": "![cf](https://i.imgur.com/7v5ASc8.png) 11: Single Resource Express API ======",
   "main": "index.js",
   "scripts": {
-    "test": "jest --coverage --forceExit --runInBand",
+    "test": "eslint . && jest --coverage --forceExit --runInBand",
     "start": "nodemon index.js",
     "dbon": "mkdir -p ./db && mongod --dbpath ./db",
     "dboff": "killall mongod"

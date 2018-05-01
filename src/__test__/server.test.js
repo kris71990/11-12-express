@@ -7,12 +7,6 @@ import { startServer, stopServer } from '../lib/server';
 
 const apiURL = `http://localhost:${process.env.PORT}/api/car`;
 
-const fakerMocks = () => {
-  return new Car({
-    make: faker.lorem.words(2),
-    model: faker.lorem.words(3),
-  }).save();
-};
 
 const createMockCar = () => {
   return new Car({
@@ -23,11 +17,19 @@ const createMockCar = () => {
   }).save();
 };
 
-const createManyMocks = (howMany) => {
-  return Promise.all(new Array(howMany)
-    .fill(0)
-    .map(() => fakerMocks()));
-};
+// const fakerMocks = () => {
+//   return new Car({
+//     make: faker.random.word(),
+//     model: faker.random.word(),
+//     year: faker.random.number(),
+//   }).save();
+// };
+
+// const createManyMocks = (howMany) => {
+//   return Promise.all(new Array(howMany)
+//     .fill(0)
+//     .map(() => fakerMocks()));
+// };
 
 describe('/api/car', () => {
   beforeAll(startServer);
@@ -41,6 +43,7 @@ describe('/api/car', () => {
       year: 2009,
       color: 'orange',
     };
+
     return superagent.post(apiURL)
       .send(testCar)
       .then((response) => {
@@ -134,7 +137,7 @@ describe('/api/car', () => {
         });
     });
 
-    test('UPDATE - should respond with 404 for id not found', () => {
+    test('PUT - should respond with 404 for id not found', () => {
       return createMockCar()
         .then(() => {
           return superagent.put(`${apiURL}/1234`);
@@ -146,4 +149,3 @@ describe('/api/car', () => {
     });
   });
 });
-

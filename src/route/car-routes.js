@@ -50,26 +50,17 @@ carRouter.put('/api/car/:id', jsonParser, (request, response, next) => {
     .catch(next);
 });
 
-carRouter.delete('/api/car/:id', (request, response) => {
+carRouter.delete('/api/car/:id', (request, response, next) => {
   return Car.findByIdAndRemove(request.params.id)
     .then((car) => {
       if (!car) {
         logger.log(logger.INFO, 'DELETE error - no car found with this id');
-        return response.sendStatus(404);
+        return next(new HttpErrors(404, 'car not found'));
       }
       logger.log(logger.INFO, 'DELETE request processed - 200 status');
       return response.sendStatus(200);
     })
-    .catch((error) => {
-      if (error.message.toLowerCase().indexOf('cast to objectid failed') > -1) {
-        logger.log(logger.INFO, `GET error - Could not parse id: ${request.params.id}`);
-        return response.sendStatus(404);
-      }
-
-      logger.log(logger.ERROR, 'DELETE ERROR 500');
-      logger.log(logger.ERROR, error);
-      return response.sendStatus(500);
-    });
+    .catch(next);
 });
 
 export default carRouter;
